@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="r0mflip">
+
+  <title>creepy // Find the stuff a website can know about you</title>
+  <meta name="description" content="A demo test to show information that can be obtained from the browser using JavaScripts APIs.">
+
+  <meta name="theme-color" content="#dd3448">
+
+  <meta property="og:title" content="creepy // find the stuff a site can know about you">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://creepy.now.sh">
+  <meta property="og:image" content="https://creepy.now.sh/creepy.png">
+
+  <meta name="twitter:title" content="creepy // find the stuff a site can know about you">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:url" content="https://creepy.now.sh">
+  <meta name="twitter:image" content="https://creepy.now.sh/creepy.png">
+  <meta name="twitter:creator" content="@r0mflip">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    html, body {
+      font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI',
+        Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: #404040;
+      font-size: 18px;
+      line-height: 1.5;
+      background-color: #ffffff;
+
+      margin: 0;
+      padding: 0;
+      display: flex;
+      width: 100%;
+      justify-content: center;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 900px;
+      padding: 3em;
+      margin: 2em 1.5em 2em;
+    }
+
+    h1 {
+      font-size: 4em;
+      margin: 0;
+      color: #dd3448;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+
+    .item {
+      padding: 0.2em 0;
+    }
+
+    code {
+      color: #a80000;
+      padding: 0.2em 0.4em;
+      margin: 0;
+      font-size: 85%;
+      background-color: rgba(27, 31, 35, .05);
+      border-radius: 3px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    noscript {
+      padding: 1em;
+      color: #dd3448;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      main {
+        margin: 2em 1em 1em;
+        padding: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <h1>creepy</h1>
+    <p>Stuff a site can know about you/device using JavaScript APIs</p>
+
+    <noscript>You seem to have JavaScript disabled, enable it to run this test</noscript>
+
+    <ul class="items"></ul>
+
+    <p class="ps hidden">The less you see in the above list the safe you are online (don't take my word for it, efficient techniques ,like ones in <a href="https://panopticlick.eff.org/" target="_blank" rel="noopener noreferer">panopticlick</a>), can be used to uniquely fingerprint you). Test this on multiple browsers and compare.</p>
+  </main>
+
+  <script>
+    (async nav => {
+      const code = msg => `<code>${msg}</code>`;
+
+      // Item list from https://developer.mozilla.org/en-US/docs/Web/API/Navigator
+      let items = [];
+
+      // BatteryManager
+      try {
+        const batteryStatus = await nav.getBattery();
+        if (batteryStatus) {
+          let status = `Your device battery has ${code(`${Math.ceil(batteryStatus.level * 100)}%`)} charge left. `;
+
+          if (batteryStatus.charging) {
+            status += `It is plugged in and may take around ${code(Math.ceil(batteryStatus.chargingTime / 60))} minutes to fill up. `;
+          }
+
+          if (batteryStatus.dischargingTime && batteryStatus.dischargingTime !== Infinity) {
+            status += `It may die in around ${code(Math.ceil(batteryStatus.dischargingTime / 60))} minutes.`;
+          }
+
+          items.push(status);
+        }
+      } catch (e) {}
+
+
+      // @TODO: geolocation
+
+
+      // language(s)
+      items.push(`Active language is ${code(nav.language || '<empty>')} while configured languages are ${(nav.languages.length ? nav.languages.map(code).join(' ') : code('<empty>'))}`);
+
+
+      // screen
+      const screen = window.screen;
+      items.push(`Screen resolution is ${code(`${screen.width}x${screen.height}`)} with color depth ${code(screen.colorDepth)} and pixel ratio of ${code(window.devicePixelRatio)}`);
+
+
+      // touch
+      if (nav.maxTouchPoints) {
+        items.push(`Your device supports upto ${code(nav.maxTouchPoints)} touch points`);
+      }
+
+
+      // storage
+      try {
+        const storageData = await nav.storage.estimate();
+        if (storageData && storageData.quota) {
+          // quota is in KB
+          items.push(`Storage on your device is around ${code(`${Math.ceil(storageData.quota / 1024 / 1024)} GB`)}`);
+        }
+      } catch (e) {}
+
+
+      // automated
+      if (nav.webdriver) {
+        items.push('Whoah! This browser session is likely automated');
+      }
+
+
+      // memory
+      if (nav.deviceMemory) {
+        items.push(`${code(`${nav.deviceMemory} GB`)} of RAM installed`);
+      }
+
+
+      // cookieEnabled
+      if (nav.cookieEnabled) {
+        items.push(`You have cookies enabled!`);
+      }
+
+      // DNT
+      if (String(nav.doNotTrack).length) {
+        items.push(`You have Do Not Track (DNT) ${Number(nav.doNotTrack) === 1 || nav.doNotTrack === 'yes' ? 'enabled' : 'disabled'}`);
+      }
+
+
+      // UA detection
+      const UAString = nav.userAgent;
+      let ua = '';
+
+      if (UAString.indexOf('Firefox') > -1) {
+        ua = 'Mozilla Firefox';
+      } else if (UAString.indexOf('SamsungBrowser') > -1) {
+        ua = 'Samsung Internet';
+      } else if (UAString.indexOf('Opera') > -1 || UAString.indexOf('OPR') > -1) {
+        ua = 'Opera';
+      } else if (UAString.indexOf('Trident') > -1) {
+        ua = 'Microsoft Internet Explorer';
+      } else if (UAString.indexOf('Edge') > -1) {
+        ua = 'Microsoft Edge';
+      } else if (UAString.indexOf('Chrome') > -1) {
+        ua = 'Google Chrome or Chromium';
+      } else if (UAString.indexOf('Safari') > -1) {
+        ua = 'Apple Safari';
+      } else {
+        ua = 'unknown';
+      }
+
+      items.push(`Your browser is ${code(ua)}`);
+
+
+      // logical processing cores
+      items.push(`Your device has ${code(nav.hardwareConcurrency)} logical processing core(s)`);
+
+      // OS info from UA string
+      const oscpu = UAString.slice(UAString.indexOf('(')+1, UAString.indexOf(')')) || '';
+      if (oscpu.length > 1) {
+        let os = '';
+        let arch = '';
+
+        if (oscpu.indexOf('OS/2') > -1) {
+          os = 'OS/2';
+        } else if (oscpu.indexOf('WindowsCE') > -1) {
+          os = 'WindowsCE';
+        } else if (oscpu.indexOf('Windows NT') > -1) {
+          os = 'Windows';
+          if (oscpu.indexOf('Win64') > -1 || oscpu.indexOf('x64') > -1) {
+            arch = 'x64';
+          } else {
+            arch = 'x86';
+          }
+        } else if (oscpu.indexOf('Intel Mac OS X') > -1 || oscpu.indexOf('macOS') === 0) {
+          os = 'Mac OS X';
+        } else if (oscpu.indexOf('like Mac OS X') > -1 && oscpu.indexOf('iPhone') > -1) {
+          os = 'iPhone';
+        } else if (oscpu.indexOf('Linux') > -1) {
+          os = 'Linux';
+          if (oscpu.indexOf('Microsoft') > -1) {
+            os = 'Microsoft Linux (WSL)';
+          }
+
+          if (oscpu.indexOf('Android') > -1) {
+            os = 'Android';
+          }
+
+          if (oscpu.indexOf('x86_64') > -1) {
+            arch = 'x64';
+          } else {
+            i = oscpu.match(/i\d86/g); // ix86
+            arch = i ? i[0] : '';
+          }
+        } else {
+          os = 'unknown';
+        }
+
+        items.push(`You are running ${code(os)} ${arch ? `on ${code(arch)} architechture` : ''}`);
+      }
+
+
+      document.querySelector('.items').innerHTML = items.map(item => `<li class="item">${item}</li>`).join('');
+      document.querySelector('.ps').classList.remove('hidden');
+    })(window.navigator);
+  </script>
+
+</body>
+</html>
