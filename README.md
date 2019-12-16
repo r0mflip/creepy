@@ -4,10 +4,11 @@
 
 > A demo to illustrate what a site can know about it's visitors using JavaScripts APIs.
 
-By visiting any website various amounts of data can be obtained by a site without any
-user concent. This data can then be used for targetting ads or tracking. Advanced
-techniques, like ones used in [panopticlick](https://panopticlick.eff.org) can
-effeciently track users by using various standard and non standard APIs.
+By visiting any website various amounts of data can be obtained by that site
+without any user concent. This data can then be used for targetting ads or
+tracking. Advanced techniques, like ones used in
+[panopticlick](https://panopticlick.eff.org) can effeciently track users by
+using various standard and non standard APIs.
 
 
 ## Tested APIs
