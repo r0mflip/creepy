@@ -2,13 +2,13 @@
 
 # [creepy](https://creepy.now.sh)
 
-This is a demo test to show information that can be obtained from the browser
-using JavaScripts APIs.
+> A demo to illustrate what a site can know about it's visitors using JavaScripts APIs.
 
-By simply visiting any website this data can be obtained by the site without any
-use concent and can be used for targetting ads or tracking. Advanced techniques,
-like ones used in [panopticlick](https://panopticlick.eff.org) can effeciently
-track users various standard and non standard APIs.
+By visiting any website various amounts of data can be obtained by a site without any
+user concent. This data can then be used for targetting ads or tracking. Advanced
+techniques, like ones used in [panopticlick](https://panopticlick.eff.org) can
+effeciently track users by using various standard and non standard APIs.
+
 
 ## Tested APIs
 
@@ -29,5 +29,18 @@ track users various standard and non standard APIs.
 13. System architechture
 14. (TODO) Geolocation
 
+All the above listed APIs can be accessed **without any** user concent.
+
+## Screenshot
+
+![demo screenshot](screenshot.png)
+
+## Related
+
+* https://github.com/wybiral/wtf
+* https://panopticlick.eff.org
+
+
 ## License
+
 [MIT](LICENSE)

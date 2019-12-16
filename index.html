@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="r0mflip">
 
-  <title>creepy // Find the stuff a website can know about you</title>
-  <meta name="description" content="A demo test to show information that can be obtained from the browser using JavaScripts APIs.">
+  <title>creepy // stuff any website can know about you</title>
+  <meta name="description" content="A demo to illustrate what a site can know about it's visitors using JavaScripts APIs.">
 
   <meta name="theme-color" content="#dd3448">
 
-  <meta property="og:title" content="creepy // find the stuff a site can know about you">
+  <meta property="og:title" content="creepy // stuff any website can know about you">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://creepy.now.sh">
   <meta property="og:image" content="https://creepy.now.sh/creepy.png">
 
-  <meta name="twitter:title" content="creepy // find the stuff a site can know about you">
+  <meta name="twitter:title" content="creepy // stuff any website can know about you">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:url" content="https://creepy.now.sh">
   <meta name="twitter:image" content="https://creepy.now.sh/creepy.png">
@@ -106,11 +106,13 @@
 
     <ul class="items"></ul>
 
-    <p class="ps hidden">The less you see in the above list the safe you are online (don't take my word for it, efficient techniques ,like ones in <a href="https://panopticlick.eff.org/" target="_blank" rel="noopener noreferer">panopticlick</a>), can be used to uniquely fingerprint you). Test this on multiple browsers and compare.</p>
+    <p class="ps hidden">By simply visiting any website the above data can be obtained by the site without any user concent and can be used for targetting ads or tracking. Advanced techniques, like ones used in <a href="https://panopticlick.eff.org/" target="_blank" rel="noopener noreferer">panopticlick</a> can effeciently track users by using various standard and non standard APIs.</p>
+
+    <p><small>Built by <a href="https://github.com/r0mflip" target="_blank" rel="noopener noreferer">@r0mflip</a></small></p>
   </main>
 
   <script>
-    (async nav => {
+    (async (nav, win) => {
       const code = msg => `<code>${msg}</code>`;
 
       // Item list from https://developer.mozilla.org/en-US/docs/Web/API/Navigator
@@ -143,8 +145,8 @@
 
 
       // screen
-      const screen = window.screen;
-      items.push(`Screen resolution is ${code(`${screen.width}x${screen.height}`)} with color depth ${code(screen.colorDepth)} and pixel ratio of ${code(window.devicePixelRatio)}`);
+      const screen = win.screen;
+      items.push(`Screen resolution is ${code(`${screen.width}x${screen.height}`)} with color depth ${code(screen.colorDepth)} and pixel ratio of ${code(Number.parseFloat(win.devicePixelRatio).toFixed(2))}`);
 
 
       // touch
@@ -188,21 +190,23 @@
 
       // UA detection
       const UAString = nav.userAgent;
+      // remove device and build info from UA, because if foils detection
+      const client = UAString.slice(0, UAString.indexOf('(')-1) + UAString.slice(UAString.indexOf(')')+1);
       let ua = '';
 
-      if (UAString.indexOf('Firefox') > -1) {
+      if (client.indexOf('Firefox') > -1) {
         ua = 'Mozilla Firefox';
-      } else if (UAString.indexOf('SamsungBrowser') > -1) {
+      } else if (client.indexOf('SamsungBrowser') > -1) {
         ua = 'Samsung Internet';
-      } else if (UAString.indexOf('Opera') > -1 || UAString.indexOf('OPR') > -1) {
+      } else if (client.indexOf('Opera') > -1 || client.indexOf('OPR') > -1) {
         ua = 'Opera';
-      } else if (UAString.indexOf('Trident') > -1) {
+      } else if (client.indexOf('Trident') > -1) {
         ua = 'Microsoft Internet Explorer';
-      } else if (UAString.indexOf('Edge') > -1) {
+      } else if (client.indexOf('Edge') > -1) {
         ua = 'Microsoft Edge';
-      } else if (UAString.indexOf('Chrome') > -1) {
+      } else if (client.indexOf('Chrome') > -1) {
         ua = 'Google Chrome or Chromium';
-      } else if (UAString.indexOf('Safari') > -1) {
+      } else if (client.indexOf('Safari') > -1) {
         ua = 'Apple Safari';
       } else {
         ua = 'unknown';
@@ -261,7 +265,7 @@
 
       document.querySelector('.items').innerHTML = items.map(item => `<li class="item">${item}</li>`).join('');
       document.querySelector('.ps').classList.remove('hidden');
-    })(window.navigator);
+    })(window.navigator, window);
   </script>
 
 </body>
